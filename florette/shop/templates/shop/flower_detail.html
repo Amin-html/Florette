@@ -1,0 +1,233 @@
+{% extends 'shop/base.html' %}
+{% block title %}{{ flower.name }} — Florette{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+.detail-image {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-hover);
+}
+.detail-image img { width: 100%; height: 450px; object-fit: cover; display: block; }
+.detail-image-placeholder {
+    width: 100%;
+    height: 450px;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10rem;
+}
+.detail-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.2rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+.detail-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d2d2d;
+    margin: 1rem 0;
+}
+.detail-desc { color: var(--text-muted); line-height: 1.8; margin-bottom: 1.5rem; }
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.qty-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.qty-btn:hover { background: var(--accent-light); border-color: #2d2d2d; }
+.qty-input {
+    width: 60px;
+    text-align: center;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.4rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.reviews-section { margin-top: 3rem; }
+.review-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.3rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+}
+.review-header { display: flex; justify-content: space-between; margin-bottom: 0.6rem; }
+.review-author { font-weight: 700; color: #1a1a1a; }
+.review-stars { color: #f4a261; }
+.review-date { font-size: 0.82rem; color: var(--text-muted); }
+.review-form-card {
+    background: var(--accent-light);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .detail-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+<div class="container">
+
+<div style="margin-bottom:1rem;">
+    <a href="{% url 'catalog' %}" style="color:var(--text-muted);text-decoration:none;font-size:0.9rem;">← Назад в каталог</a>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-image">
+        {% if flower.image %}
+            <img src="{{ flower.image.url }}" alt="{{ flower.name }}">
+        {% else %}
+            <div class="detail-image-placeholder"></div>
+        {% endif %}
+    </div>
+
+    <div>
+        {% if flower.category %}<div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">{{ flower.category.name }}</div>{% endif %}
+        <h1 class="detail-title">{{ flower.name }}</h1>
+
+        <div class="stars" style="font-size:1.1rem;">
+            {% with avg=flower.avg_rating %}
+            {% for i in "12345" %}{% if forloop.counter <= avg %}★{% else %}☆{% endif %}{% endfor %}
+            {% endwith %}
+            <span style="color:var(--text-muted);font-size:0.9rem;">({{ reviews.count }} отзывов)</span>
+        </div>
+
+        <div class="detail-price">{{ flower.price }} ₽</div>
+        <p class="detail-desc">{{ flower.description }}</p>
+
+        {% if flower.in_stock %}
+        <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input type="number" id="qty" class="qty-input" value="1" min="1" max="99">
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <button onclick="addToCartQty({{ flower.pk }})" class="btn btn-primary" style="font-size:1.05rem;padding:0.8rem 2rem;">
+            🛒 Добавить в корзину
+        </button>
+        {% else %}
+        <div style="color:#ff6b8a;font-weight:600;margin:1rem 0;">Нет в наличии</div>
+        {% endif %}
+
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;gap:2rem;font-size:0.9rem;color:var(--text-muted);">
+            <span>Доставка 2–4 часа</span>
+            <span>Бесплатная упаковка</span>
+        </div>
+    </div>
+</div>
+
+<!-- REVIEWS -->
+<div class="reviews-section">
+    <h2 style="font-family:'Inter',sans-serif;font-size:1.8rem;color:#1a1a1a;margin-bottom:1.5rem;">
+        Отзывы покупателей
+    </h2>
+
+    {% if user.is_authenticated and not user_review %}
+    <div class="review-form-card" style="margin-bottom:2rem;">
+        <h3 style="margin-bottom:1rem;font-family:'Inter',sans-serif;">Оставить отзыв</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.rating.label_tag }}
+                {{ form.rating }}
+                {% if form.rating.errors %}<div class="form-error">{{ form.rating.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.text.label_tag }}
+                {{ form.text }}
+            </div>
+            <button type="submit" class="btn btn-primary">Опубликовать отзыв</button>
+        </form>
+    </div>
+    {% elif not user.is_authenticated %}
+    <div style="background:var(--accent-light);border-radius:14px;padding:1.2rem;margin-bottom:2rem;text-align:center;">
+        <a href="{% url 'login' %}" class="btn btn-primary">Войдите</a>, чтобы оставить отзыв
+    </div>
+    {% elif user_review %}
+    <div style="background:var(--accent-light);border-radius:14px;padding:1.2rem;margin-bottom:2rem;color:#1a1a1a;font-weight:600;">
+        Вы уже оставили отзыв на этот товар
+    </div>
+    {% endif %}
+
+    {% if reviews %}
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-header">
+                <div>
+                    <span class="review-author">{{ review.user.username }}</span>
+                    <span class="review-stars" style="margin-left:0.8rem;">
+                        {% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}
+                    </span>
+                </div>
+                <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+            </div>
+            <p style="color:var(--text);line-height:1.6;">{{ review.text }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+    <p style="text-align:center;color:var(--text-muted);padding:2rem;">Пока нет отзывов. Будьте первой!</p>
+    {% endif %}
+</div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeQty(delta) {
+    const input = document.getElementById('qty');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 99) val = 99;
+    input.value = val;
+}
+function addToCartQty(pk) {
+    const qty = parseInt(document.getElementById('qty').value);
+    // Add one by one to match session logic — or use update
+    fetch(`/cart/update/${pk}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify({quantity: qty})
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            const badge = document.querySelector('.nav-cart .badge');
+            if (badge) badge.textContent = d.count;
+            else {
+                const b = document.createElement('span');
+                b.className = 'badge'; b.textContent = d.count;
+                document.querySelector('.nav-cart').appendChild(b);
+            }
+            showToast('Добавлено в корзину!');
+        }
+    });
+}
+</script>
+{% endblock %}

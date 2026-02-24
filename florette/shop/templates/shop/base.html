@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Florette{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --accent: #2d2d2d;
+            --accent-hover: #111111;
+            --accent-light: #f5f5f5;
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #757575;
+            --border: #e0e0e0;
+            --border-light: #f0f0f0;
+            --shadow: 0 2px 12px rgba(0,0,0,0.07);
+            --shadow-hover: 0 6px 24px rgba(0,0,0,0.12);
+            --success: #2e7d32;
+            --danger: #c62828;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 15px;
+        }
+
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        .nav-cart {
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            padding: 0.45rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.88rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+        .nav-cart:hover { background: var(--accent-hover); }
+
+        .nav-cart .badge {
+            background: white;
+            color: var(--accent);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.3rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: var(--accent-light); border-color: #999; }
+        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #b71c1c; }
+
+        .messages { padding: 0.5rem 2rem; }
+        .message {
+            padding: 0.75rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.88rem;
+        }
+        .message.success { background: #e8f5e9; border-left: 4px solid var(--success); color: var(--success); }
+        .message.error { background: #ffebee; border-left: 4px solid var(--danger); color: var(--danger); }
+        .message.warning { background: #fffde7; border-left: 4px solid #f9a825; color: #795548; }
+
+        main { min-height: calc(100vh - 120px); }
+
+        footer {
+            background: var(--accent);
+            color: #bdbdbd;
+            text-align: center;
+            padding: 1.8rem;
+            font-size: 0.84rem;
+        }
+        footer a { color: #e0e0e0; text-decoration: none; }
+        footer strong { color: white; }
+
+        .form-input {
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            background: white;
+            color: var(--text);
+            transition: border-color 0.15s;
+        }
+        .form-input:focus { outline: none; border-color: var(--accent); }
+        select.form-input { appearance: auto; }
+
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group label { display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .form-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.3rem; }
+
+        .flower-card {
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            transition: all 0.25s;
+            position: relative;
+        }
+        .flower-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+
+        .flower-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .flower-card-placeholder {
+            width: 100%;
+            height: 220px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .flower-card-body { padding: 1.1rem; }
+        .flower-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+        .flower-card-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.8rem;
+        }
+
+        .badge-featured {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .stars { color: #f59e0b; font-size: 0.88rem; }
+
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .section { padding: 3rem 0; }
+
+        .page-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 2.5rem 0 2rem;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .page-header p { color: var(--text-muted); margin-top: 0.4rem; font-size: 0.92rem; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            .nav-links { gap: 0.8rem; }
+            .nav-links .hide-mobile { display: none; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav>
+    <a href="{% url 'index' %}" class="nav-logo">Florette</a>
+    <ul class="nav-links">
+        <li><a href="{% url 'catalog' %}">Каталог</a></li>
+        {% if user.is_authenticated %}
+            <li class="hide-mobile"><a href="{% url 'my_orders' %}">Мои заказы</a></li>
+            {% if user.is_staff %}
+                <li><a href="{% url 'admin_panel' %}" style="color:var(--text);font-weight:700;">Панель</a></li>
+            {% endif %}
+            <li><a href="{% url 'logout' %}">Выйти</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Войти</a></li>
+            <li><a href="{% url 'register' %}" class="btn btn-primary btn-sm">Регистрация</a></li>
+        {% endif %}
+    </ul>
+    <a href="{% url 'cart' %}" class="nav-cart">
+        🛒 Корзина
+        {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
+    </a>
+</nav>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer>
+    <p><strong>Florette</strong> — цветы с доставкой &nbsp;|&nbsp; <a href="{% url 'catalog' %}">Каталог</a> &nbsp;|&nbsp; © 2024</p>
+</footer>
+
+<script>
+function getCookie(name) {
+    let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return v ? v[2] : null;
+}
+
+function addToCart(pk) {
+    fetch(`/cart/add/${pk}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': getCookie('csrftoken')}
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            const badge = document.querySelector('.nav-cart .badge');
+            const cart = document.querySelector('.nav-cart');
+            if (badge) badge.textContent = d.count;
+            else {
+                const b = document.createElement('span');
+                b.className = 'badge';
+                b.textContent = d.count;
+                cart.appendChild(b);
+            }
+            showToast('Добавлено в корзину');
+        }
+    });
+}
+
+function showToast(msg) {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:#1a1a1a;color:white;padding:0.75rem 1.4rem;border-radius:8px;font-weight:600;z-index:9999;animation:slideIn 0.25s ease;font-size:0.88rem;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+}
+</script>
+<style>
+@keyframes slideIn { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

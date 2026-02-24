@@ -1,0 +1,58 @@
+{% extends 'shop/base.html' %}
+{% block title %}Оформление заказа — Florette{% endblock %}
+
+{% block extra_css %}
+<style>
+.checkout-layout { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start; }
+.checkout-card { background:white;border-radius:16px;padding:2rem;box-shadow:var(--shadow); }
+.order-item { display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.95rem; }
+@media(max-width:768px) { .checkout-layout{grid-template-columns:1fr;} }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Оформление заказа</h1>
+</div>
+<section class="section">
+<div class="container">
+<div class="checkout-layout">
+
+    <div class="checkout-card">
+        <h2 style="font-family:'Inter',sans-serif;margin-bottom:1.5rem;">Данные для доставки</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>{{ form.address.label }}</label>
+                {{ form.address }}
+                {% if form.address.errors %}<div class="form-error">{{ form.address.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label>{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}<div class="form-error">{{ form.phone.errors }}</div>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:0.9rem;margin-top:0.5rem;">
+                Подтвердить заказ
+            </button>
+        </form>
+    </div>
+
+    <div class="checkout-card">
+        <h3 style="font-family:'Inter',sans-serif;margin-bottom:1rem;">Ваш заказ</h3>
+        {% for item in items %}
+        <div class="order-item">
+            <span>{{ item.flower.name }} × {{ item.qty }}</span>
+            <span style="font-weight:600;">{{ item.subtotal }} ₽</span>
+        </div>
+        {% endfor %}
+        <div style="display:flex;justify-content:space-between;padding-top:1rem;font-size:1.2rem;font-weight:700;color:#2d2d2d;">
+            <span>Итого:</span>
+            <span>{{ total }} ₽</span>
+        </div>
+    </div>
+
+</div>
+</div>
+</section>
+{% endblock %}

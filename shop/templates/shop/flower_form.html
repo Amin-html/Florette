@@ -1,0 +1,54 @@
+{% extends 'shop/base.html' %}
+{% block title %}{{ action }} цветок — Florette{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-card { max-width:640px;margin:3rem auto;background:white;border-radius:20px;padding:2.5rem;box-shadow:var(--shadow-hover); }
+.form-title { font-family:'Inter',sans-serif;font-size:1.8rem;color:#1a1a1a;margin-bottom:2rem; }
+.checkbox-row { display:flex;align-items:center;gap:0.7rem;margin-bottom:1.2rem; }
+.checkbox-row input[type=checkbox] { width:18px;height:18px;accent-color:#2d2d2d; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+<div class="container">
+<div class="form-card">
+    <h1 class="form-title">{{ action }} цветок</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+            <div class="checkbox-row">
+                {{ field }}
+                <label for="{{ field.id_for_label }}" style="font-weight:600;cursor:pointer;">{{ field.label }}</label>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="form-error">{{ field.errors }}</div>{% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if flower and flower.image %}
+        <div style="margin-bottom:1rem;">
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Текущее фото:</p>
+            <img src="{{ flower.image.url }}" style="width:120px;height:120px;object-fit:cover;border-radius:10px;">
+        </div>
+        {% endif %}
+
+        <div style="display:flex;gap:1rem;margin-top:1rem;">
+            <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;padding:0.8rem;">
+                Сохранить
+            </button>
+            <a href="{% url 'admin_panel' %}" class="btn btn-outline" style="flex:1;justify-content:center;padding:0.8rem;">
+                Отмена
+            </a>
+        </div>
+    </form>
+</div>
+</div>
+</section>
+{% endblock %}

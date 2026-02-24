@@ -1,0 +1,16 @@
+{% extends 'shop/base.html' %}
+{% block title %}Удалить цветок — Florette{% endblock %}
+{% block content %}
+<section class="section">
+<div class="container" style="max-width:480px;text-align:center;padding:4rem 1.5rem;">
+    <div style="font-size:4rem;margin-bottom:1rem;">🗑️</div>
+    <h1 style="font-family:'Inter',sans-serif;color:var(--text);margin-bottom:1rem;">Удалить «{{ flower.name }}»?</h1>
+    <p style="color:var(--text-muted);margin-bottom:2rem;">Это действие нельзя отменить.</p>
+    <form method="POST" style="display:flex;gap:1rem;justify-content:center;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Да, удалить</button>
+        <a href="{% url 'admin_panel' %}" class="btn btn-outline">Отмена</a>
+    </form>
+</div>
+</section>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'shop/base.html' %}
+{% block title %}Каталог — Florette{% endblock %}
+
+{% block extra_css %}
+<style>
+.filters {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+.filter-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.filter-group label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.filter-input {
+    padding: 0.6rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.9rem;
+    background: white;
+    min-width: 160px;
+}
+.filter-input:focus { outline: none; border-color: #2d2d2d; }
+.empty-state { text-align: center; padding: 5rem 2rem; color: var(--text-muted); }
+.empty-state span { font-size: 5rem; display: block; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Каталог цветов</h1>
+    <p>{{ flowers|length }} прекрасных букетов ждут вас</p>
+</div>
+
+<section class="section">
+<div class="container">
+
+<form method="GET" class="filters">
+    <div class="filter-group">
+        <label>Поиск</label>
+        <input type="text" name="q" value="{{ search }}" class="filter-input" placeholder="Название...">
+    </div>
+    <div class="filter-group">
+        <label>Категория</label>
+        <select name="category" class="filter-input">
+            <option value="">Все категории</option>
+            {% for cat in categories %}
+            <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Сортировка</label>
+        <select name="sort" class="filter-input">
+            <option value="">По умолчанию</option>
+            <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Цена ↑</option>
+            <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Цена ↓</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Найти</button>
+    <a href="{% url 'catalog' %}" class="btn btn-outline">Сбросить</a>
+</form>
+
+{% if flowers %}
+<div class="grid-4">
+    {% for flower in flowers %}
+    <div class="flower-card">
+        {% if flower.is_featured %}<span class="badge-featured">Хит</span>{% endif %}
+        <a href="{% url 'flower_detail' flower.pk %}">
+            {% if flower.image %}
+                <img src="{{ flower.image.url }}" alt="{{ flower.name }}">
+            {% else %}
+                <div class="flower-card-placeholder"></div>
+            {% endif %}
+        </a>
+        <div class="flower-card-body">
+            <div class="stars">
+                {% for i in "12345" %}{% if forloop.counter <= flower.avg_rating %}★{% else %}☆{% endif %}{% endfor %}
+                <span style="color:var(--text-muted);font-size:0.82rem;">({{ flower.reviews.count }} отзывов)</span>
+            </div>
+            <h3 class="flower-card-title">
+                <a href="{% url 'flower_detail' flower.pk %}" style="text-decoration:none;color:inherit;">{{ flower.name }}</a>
+            </h3>
+            {% if flower.category %}<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">{{ flower.category.name }}</div>{% endif %}
+            <div class="flower-card-price">{{ flower.price }} ₽</div>
+            <button onclick="addToCart({{ flower.pk }})" class="btn btn-primary" style="width:100%;justify-content:center;">
+                🛒 В корзину
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <span>🌿</span>
+    <h2>Ничего не найдено</h2>
+    <p>Попробуйте другой запрос или сбросьте фильтры</p>
+    <a href="{% url 'catalog' %}" class="btn btn-primary" style="margin-top:1rem;">Показать все</a>
+</div>
+{% endif %}
+
+</div>
+</section>
+{% endblock %}

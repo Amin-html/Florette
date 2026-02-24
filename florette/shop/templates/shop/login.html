@@ -1,0 +1,35 @@
+{% extends 'shop/base.html' %}
+{% block title %}Вход — Florette{% endblock %}
+{% block extra_css %}
+<style>
+.auth-card { max-width:440px;margin:4rem auto;background:white;border-radius:20px;padding:2.5rem;box-shadow:var(--shadow-hover); }
+.auth-title { font-family:'Inter',sans-serif;font-size:2rem;color:#1a1a1a;text-align:center;margin-bottom:0.5rem; }
+.auth-sub { text-align:center;color:var(--text-muted);margin-bottom:2rem; }
+</style>
+{% endblock %}
+{% block content %}
+<section class="section">
+<div class="container">
+<div class="auth-card">
+    <h1 class="auth-title">Войти</h1>
+    <p class="auth-sub">Рады видеть вас снова!</p>
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" class="form-input" placeholder="{{ field.label }}">
+            {% if field.errors %}<div class="form-error">{{ field.errors }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.8rem;font-size:1rem;margin-top:0.5rem;">
+            Войти
+        </button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;color:var(--text-muted);">
+        Нет аккаунта? <a href="{% url 'register' %}" style="color:#2d2d2d;font-weight:700;">Зарегистрироваться</a>
+    </p>
+</div>
+</div>
+</section>
+{% endblock %}

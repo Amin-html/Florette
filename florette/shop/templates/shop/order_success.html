@@ -1,0 +1,27 @@
+{% extends 'shop/base.html' %}
+{% block title %}Заказ оформлен — Florette{% endblock %}
+{% block content %}
+<section class="section">
+<div class="container" style="text-align:center;max-width:600px;padding:4rem 1.5rem;">
+    <div style="font-size:5rem;margin-bottom:1rem;">🎉</div>
+    <h1 style="font-family:'Inter',sans-serif;font-size:2.5rem;color:var(--text);margin-bottom:1rem;">
+        Заказ оформлен!
+    </h1>
+    <p style="color:var(--text-muted);font-size:1.1rem;margin-bottom:0.5rem;">
+        Заказ <strong>#{{ order.id }}</strong> принят в обработку.
+    </p>
+    <p style="color:var(--text-muted);margin-bottom:2rem;">
+        Мы скоро свяжемся с вами по телефону для подтверждения доставки 🌸
+    </p>
+    <div style="background:var(--accent-light);border-radius:14px;padding:1.5rem;margin-bottom:2rem;text-align:left;">
+        <p><strong>Адрес:</strong> {{ order.address }}</p>
+        <p style="margin-top:0.5rem;"><strong>Телефон:</strong> {{ order.phone }}</p>
+        <p style="margin-top:0.5rem;"><strong>Сумма:</strong> {{ order.total }} ₽</p>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="{% url 'my_orders' %}" class="btn btn-outline">Мои заказы</a>
+        <a href="{% url 'catalog' %}" class="btn btn-primary">Продолжить покупки</a>
+    </div>
+</div>
+</section>
+{% endblock %}

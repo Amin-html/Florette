@@ -1,0 +1,53 @@
+    {% extends 'shop/base.html' %}
+{% block title %}Мои заказы — Florette{% endblock %}
+
+{% block extra_css %}
+<style>
+.order-card { background:white;border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:var(--shadow); }
+.order-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem; }
+.status-badge { padding:0.3rem 0.8rem;border-radius:20px;font-size:0.8rem;font-weight:700; }
+.status-new { background:var(--accent-light);color:#2d2d2d; }
+.status-processing { background:#fff3cd;color:#856404; }
+.status-shipped { background:#d1ecf1;color:#0c5460; }
+.status-delivered { background:#d4edda;color:#155724; }
+.status-cancelled { background:#f8d7da;color:#721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Мои заказы</h1>
+</div>
+<section class="section">
+<div class="container" style="max-width:800px;">
+{% if orders %}
+    {% for order in orders %}
+    <div class="order-card">
+        <div class="order-header">
+            <h3 style="font-family:'Inter',sans-serif;">Заказ #{{ order.id }}</h3>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.8rem;">
+            {{ order.created_at|date:"d.m.Y H:i" }} · {{ order.address }}
+        </div>
+        {% for item in order.items.all %}
+        <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+            <span>{{ item.flower.name }} × {{ item.quantity }}</span>
+            <span>{{ item.subtotal }} ₽</span>
+        </div>
+        {% endfor %}
+        <div style="display:flex;justify-content:flex-end;padding-top:0.8rem;font-weight:700;color:#2d2d2d;">
+            Итого: {{ order.total }} ₽
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div style="text-align:center;padding:4rem;color:var(--text-muted);">
+    <span style="font-size:4rem;display:block;margin-bottom:1rem;">📭</span>
+    <h2>Нет заказов</h2>
+    <a href="{% url 'catalog' %}" class="btn btn-primary" style="margin-top:1.5rem;">Перейти в каталог</a>
+</div>
+{% endif %}
+</div>
+</section>
+{% endblock %}
